@@ -33,7 +33,7 @@ router.post('/problem/feedback', (req, res) => {
   }
 })
 // 发表文章
-router.post('/add/text', (req, res) => {
+router.post('/add/article', (req, res) => {
   const { title, contentDesc, textType } = req.body
   if(title && contentDesc && textType) {
     const contentStr = comonUtils.setSymbol(contentDesc)
@@ -61,7 +61,7 @@ router.post('/add/text', (req, res) => {
   }
 })
 // 根据文章类别查询文章类别
-router.get('/text/list', (req, res) => {
+router.get('/article/list', (req, res) => {
   const { textType } = req.query
   if(textType) {
     connection.query(`select * from text_list where textType=${textType}`,  (error, results)=> {
@@ -88,7 +88,7 @@ router.get('/text/list', (req, res) => {
   }
 })
 // 根据文章id查询文章
-router.get('/text/details', (req, res) => {
+router.get('/article/details', (req, res) => {
   const { id } = req.query
   if(id) {
     connection.query(`select * from text_list where id=${id}`,  (error, results)=> {
