@@ -33,8 +33,16 @@ router.post('/problem/feedback', (req, res) => {
   }
 })
 // 发表文章
-router.post('/add/article', (req, res) => {
+router.post('/add/article', async (req, res) => {
   const { title, contentDesc, textType } = req.body
+  const tokenIsValid = await comonUtils.tokenValid(connection, req.headers.authorization)
+  if (!tokenIsValid) {
+    res.send({
+      code: 403,
+      msg: '登录失效，请登录'
+    })
+    return
+  }
   if(title && contentDesc && textType) {
     const contentStr = comonUtils.setSymbol(contentDesc)
     const newTitle = comonUtils.setSymbol(title)
@@ -107,6 +115,36 @@ router.get('/article/details', (req, res) => {
           msg: '服务器错误'
         })
       }
+    })
+  }else {
+    res.send({
+      code: -1,
+      data: '请求参数不正确',
+      msg: '执行失败'
+    })
+  }
+})
+// 根据用户名与密码登录
+router.post('/article/login', (req, res) => {
+  const { userName, password } = req.body
+  if(userName && password) {
+    connection.query(`select * from user_info where userName='${userName}' and password='${password}'`,  (error, results)=> {
+      if (error) throw error
+      if(!results.length) {
+        res.send({
+          code: -1,
+          data: null,
+          msg: '账号或密码错误'
+        })
+      } else {
+        console.log('数据', results[0])
+        res.send({
+          code: 0,
+          data: results[0].token,
+          msg: '执行成功'
+        })
+      }
+      
     })
   }else {
     res.send({

@@ -49,9 +49,27 @@ function setSymbol(str) {
     if (!ascending) return a[key] - b[key];
   });
 }
+/**
+ * 功能：根据token做权限控制
+ * @param {Function} connection (mysql)
+ * @param {String} token (token)
+ */
+ function tokenValid(connection, token = '') {
+  return new Promise((resolve) => {
+    connection.query(`select * from user_info where token='${token}'`,  (error, results)=> {
+      if(!error){
+        const tokenIsValid = results.length !== 0
+        resolve(tokenIsValid)
+      }
+      resolve(false)
+    })
+  })
+  
+}
 
 module.exports = {
   getNowFormatDate,
   setSymbol,
-  arraySort
+  arraySort,
+  tokenValid
 }
