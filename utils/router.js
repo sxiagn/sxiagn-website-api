@@ -32,6 +32,7 @@ router.post('/problem/feedback', (req, res) => {
     })
   }
 })
+
 // 发表文章
 router.post('/add/article', async (req, res) => {
   const { title, contentDesc, textType } = req.body
@@ -68,8 +69,9 @@ router.post('/add/article', async (req, res) => {
     })
   }
 })
-// 根据文章类别查询文章类别
-router.get('/article/list', (req, res) => {
+
+// 根据文章类别查询文章列表
+router.get('/article/list/byTextType', (req, res) => {
   const { textType } = req.query
   if(textType) {
     connection.query(`select * from text_list where textType=${textType}`,  (error, results)=> {
@@ -95,6 +97,26 @@ router.get('/article/list', (req, res) => {
     })
   }
 })
+
+// 获取所有文章
+router.get('/article/getAllArticleList', (req, res) => {
+  connection.query(`select * from text_list order by id desc`,  (error, results)=> {
+    if (error) throw error
+    if(!error){
+      res.send({
+        code: 0,
+        data: results,
+        msg: '执行成功'
+      })
+    } else{
+      res.send({
+        code: -1,
+        msg: '服务器错误'
+      })
+    }
+  })
+})
+
 // 根据文章id查询文章
 router.get('/article/details', (req, res) => {
   const { id } = req.query
@@ -124,6 +146,7 @@ router.get('/article/details', (req, res) => {
     })
   }
 })
+
 // 根据用户名与密码登录
 router.post('/article/login', (req, res) => {
   const { userName, password } = req.body
@@ -137,7 +160,6 @@ router.post('/article/login', (req, res) => {
           msg: '账号或密码错误'
         })
       } else {
-        console.log('数据', results[0])
         res.send({
           code: 0,
           data: results[0].token,
@@ -145,6 +167,27 @@ router.post('/article/login', (req, res) => {
         })
       }
       
+    })
+  }else {
+    res.send({
+      code: -1,
+      data: '请求参数不正确',
+      msg: '执行失败'
+    })
+  }
+})
+
+// 根据文章id与textType删除文章
+router.get('/article/delete/byIdAndTextTye', (req, res) => {
+  const { id, textType } = req.query
+  if(id && textType) {
+    connection.query(`delete from text_list where id='${id}' and textType='${textType}'`,  (error, results)=> {
+      if (error) throw error
+      res.send({
+        code: 0,
+        data: results,
+        msg: '执行成功'
+      })
     })
   }else {
     res.send({
