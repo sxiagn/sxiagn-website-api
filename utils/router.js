@@ -4,6 +4,44 @@ const comonUtils = require('./common')
 const router = express.Router()
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+// 生成token插件
+const jwt = require('jsonwebtoken')
+const CONST_DATA = require('./const-data')
+
+// 根据用户名与密码登录
+router.post('/article/login', (req, res) => {
+  const { userName, password } = req.body
+  if(userName && password) {
+    connection.query(`select * from user_info where userName='${userName}' and password='${password}'`,  (error, results)=> {
+      if (error) throw error
+      if(!results.length) {
+        res.send({
+          code: -1,
+          data: null,
+          msg: '账号或密码错误'
+        })
+      } else {
+        const token = jwt.sign(
+          { user: { name: userName, password: password } },
+          CONST_DATA.SECRET_KEY,
+          { expiresIn: '3h' }
+        )
+        res.send({
+          code: 0,
+          data: token,
+          msg: '执行成功'
+        })
+      }
+      
+    })
+  }else {
+    res.send({
+      code: -1,
+      data: '请求参数不正确',
+      msg: '执行失败'
+    })
+  }
+})
 
 
 // 首页问题反馈
@@ -36,14 +74,7 @@ router.post('/problem/feedback', (req, res) => {
 // 发表文章
 router.post('/article/add', async (req, res) => {
   const { title, contentDesc, textType } = req.body
-  const tokenIsValid = await comonUtils.tokenValid(connection, req.headers.authorization)
-  if (!tokenIsValid) {
-    res.send({
-      code: 403,
-      msg: '登录失效，请登录'
-    })
-    return
-  }
+  // console.log('解析token后获取的数据', req.user)
   if(title && contentDesc && textType) {
     const contentStr = comonUtils.setSymbol(contentDesc)
     const newTitle = comonUtils.setSymbol(title)
@@ -72,14 +103,6 @@ router.post('/article/add', async (req, res) => {
 // 编辑文章
 router.post('/article/edit', async (req, res) => {
   const { title, contentDesc, textType, id } = req.body
-  const tokenIsValid = await comonUtils.tokenValid(connection, req.headers.authorization)
-  if (!tokenIsValid) {
-    res.send({
-      code: 403,
-      msg: '登录失效，请登录'
-    })
-    return
-  }
   if(title && contentDesc && textType && id) {
     const contentStr = comonUtils.setSymbol(contentDesc)
     const newTitle = comonUtils.setSymbol(title)
@@ -183,35 +206,6 @@ router.get('/article/details', (req, res) => {
   }
 })
 
-// 根据用户名与密码登录
-router.post('/article/login', (req, res) => {
-  const { userName, password } = req.body
-  if(userName && password) {
-    connection.query(`select * from user_info where userName='${userName}' and password='${password}'`,  (error, results)=> {
-      if (error) throw error
-      if(!results.length) {
-        res.send({
-          code: -1,
-          data: null,
-          msg: '账号或密码错误'
-        })
-      } else {
-        res.send({
-          code: 0,
-          data: results[0].token,
-          msg: '执行成功'
-        })
-      }
-      
-    })
-  }else {
-    res.send({
-      code: -1,
-      data: '请求参数不正确',
-      msg: '执行失败'
-    })
-  }
-})
 
 // 根据文章id与textType删除文章
 router.get('/article/delete/byIdAndTextTye', (req, res) => {
