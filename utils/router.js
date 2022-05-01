@@ -34,7 +34,7 @@ router.post('/problem/feedback', (req, res) => {
 })
 
 // 发表文章
-router.post('/add/article', async (req, res) => {
+router.post('/article/add', async (req, res) => {
   const { title, contentDesc, textType } = req.body
   const tokenIsValid = await comonUtils.tokenValid(connection, req.headers.authorization)
   if (!tokenIsValid) {
@@ -49,6 +49,42 @@ router.post('/add/article', async (req, res) => {
     const newTitle = comonUtils.setSymbol(title)
     const createTime = comonUtils.getNowFormatDate()
     connection.query(`insert into text_list(title,contentDesc,textType,createTime) value('${newTitle}','${contentStr}','${textType}','${createTime}')`, (error, results)=> {
+      if(!error){
+        res.send({
+          code: 0,
+          msg: '执行成功'
+        })
+      } else{
+        res.send({
+          code: -1,
+          msg: '服务器错误~~'
+        })
+      }
+    })
+  } else {
+    res.send({
+      code: -1,
+      data: '请检查传参',
+      msg: '执行失败'
+    })
+  }
+})
+// 编辑文章
+router.post('/article/edit', async (req, res) => {
+  const { title, contentDesc, textType, id } = req.body
+  const tokenIsValid = await comonUtils.tokenValid(connection, req.headers.authorization)
+  if (!tokenIsValid) {
+    res.send({
+      code: 403,
+      msg: '登录失效，请登录'
+    })
+    return
+  }
+  if(title && contentDesc && textType && id) {
+    const contentStr = comonUtils.setSymbol(contentDesc)
+    const newTitle = comonUtils.setSymbol(title)
+    const createTime = comonUtils.getNowFormatDate()
+    connection.query(`update text_list set title='${newTitle}',textType='${textType}',contentDesc='${contentStr}',createTime='${createTime}' where id='${id}'`, (error, results)=> {
       if(!error){
         res.send({
           code: 0,
