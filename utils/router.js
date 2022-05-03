@@ -7,12 +7,13 @@ const upload = multer({ dest: 'uploads/' });
 // 生成token插件
 const jwt = require('jsonwebtoken')
 const CONST_DATA = require('./const-data')
+const AESUTIL = require('./crypto')
 
 // 根据用户名与密码登录
 router.post('/article/login', (req, res) => {
   const { userName, password } = req.body
   if(userName && password) {
-    connection.query(`select * from user_info where userName='${userName}' and password='${password}'`,  (error, results)=> {
+    connection.query(`select * from user_info where userName='${AESUTIL.decrypt(userName)}' and password='${AESUTIL.decrypt(password)}'`,  (error, results)=> {
       if (error) throw error
       if(!results.length) {
         res.send({
