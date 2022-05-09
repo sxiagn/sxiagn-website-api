@@ -4,7 +4,8 @@ const sqlConfig = {
   host     : 'localhost',
   user     : 'root',
   password : 'root',
-  database : 'sxiagn_website_api'
+  database : 'sxiagn_website_api',
+  useConnectionPooling: true
 }
 let connection = mysql.createConnection(sqlConfig)
 connection.connect(handleErro)
