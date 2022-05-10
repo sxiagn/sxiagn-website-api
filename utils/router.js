@@ -18,18 +18,18 @@ router.post('/article/login', (req, res) => {
         comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试')
         return
       }
-      if(!results.length) {
+      if(!results.length) { 
         comonUtils.resSend(res, -1, null, '账号或密码错误')
       } else {
-        const token = jwt.sign(
+        const token = jwt.sign(  
           { user: { name: userName, password: password } },
           CONST_DATA.SECRET_KEY,
           { expiresIn: '3h' }
         )
         comonUtils.resSend(res, 0, token, '执行成功')
       }
-      return
     })
+    return
   }
   comonUtils.resSend(res, -1, '请求参数不正确', '执行失败')
 })
