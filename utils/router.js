@@ -14,34 +14,24 @@ router.post('/article/login', (req, res) => {
   const { userName, password } = req.body
   if(userName && password) {
     connection.query(`select * from user_info where userName='${AESUTIL.decrypt(userName)}' and password='${AESUTIL.decrypt(password)}'`,  (error, results)=> {
-      if (error) throw error
+      if(error) {
+        comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试')
+        return
+      }
       if(!results.length) {
-        res.send({
-          code: -1,
-          data: null,
-          msg: '账号或密码错误'
-        })
+        comonUtils.resSend(res, -1, null, '账号或密码错误')
       } else {
         const token = jwt.sign(
           { user: { name: userName, password: password } },
           CONST_DATA.SECRET_KEY,
           { expiresIn: '3h' }
         )
-        res.send({
-          code: 0,
-          data: token,
-          msg: '执行成功'
-        })
+        comonUtils.resSend(res, 0, token, '执行成功')
       }
-      
-    })
-  }else {
-    res.send({
-      code: -1,
-      data: '请求参数不正确',
-      msg: '执行失败'
+      return
     })
   }
+  comonUtils.resSend(res, -1, '请求参数不正确', '执行失败')
 })
 
 
@@ -51,25 +41,11 @@ router.post('/problem/feedback', (req, res) => {
   if(problemDesc) {
     const createTime = comonUtils.getNowFormatDate()
     connection.query(`insert into problem_list(problemDesc,createTime,isFinish) value('${problemDesc}','${createTime}','${false}')`,  (error, results)=> {
-      if(!error){
-        res.send({
-          code: 0,
-          msg: '执行成功'
-        })
-      } else{
-        res.send({
-          code: -1,
-          msg: '服务器错误'
-        })
-      }
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, null, '执行成功')
     })
-  } else {
-    res.send({
-      code: -1,
-      data: '请检查传参',
-      msg: '执行失败'
-    })
+    return
   }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
 })
 
 // 发表文章
@@ -81,25 +57,11 @@ router.post('/article/add', async (req, res) => {
     const newTitle = comonUtils.setSymbol(title)
     const createTime = comonUtils.getNowFormatDate()
     connection.query(`insert into text_list(title,contentDesc,textType,createTime) value('${newTitle}','${contentStr}','${textType}','${createTime}')`, (error, results)=> {
-      if(!error){
-        res.send({
-          code: 0,
-          msg: '执行成功'
-        })
-      } else{
-        res.send({
-          code: -1,
-          msg: '服务器错误~~'
-        })
-      }
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, null, '执行成功')
     })
-  } else {
-    res.send({
-      code: -1,
-      data: '请检查传参',
-      msg: '执行失败'
-    })
+    return
   }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
 })
 // 编辑文章
 router.post('/article/edit', async (req, res) => {
@@ -109,25 +71,11 @@ router.post('/article/edit', async (req, res) => {
     const newTitle = comonUtils.setSymbol(title)
     const createTime = comonUtils.getNowFormatDate()
     connection.query(`update text_list set title='${newTitle}',textType='${textType}',contentDesc='${contentStr}',createTime='${createTime}' where id='${id}'`, (error, results)=> {
-      if(!error){
-        res.send({
-          code: 0,
-          msg: '执行成功'
-        })
-      } else{
-        res.send({
-          code: -1,
-          msg: '服务器错误~~'
-        })
-      }
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, null, '执行成功')
     })
-  } else {
-    res.send({
-      code: -1,
-      data: '请检查传参',
-      msg: '执行失败'
-    })
+    return
   }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
 })
 
 // 根据文章类别查询文章列表
@@ -135,45 +83,17 @@ router.get('/article/list/byTextType', (req, res) => {
   const { textType } = req.query
   if(textType) {
     connection.query(`select * from text_list where textType=${textType}`,  (error, results)=> {
-      if (error) throw error
-      if(!error){
-        res.send({
-          code: 0,
-          data: comonUtils.arraySort(results, 'id', true),
-          msg: '执行成功'
-        })
-      } else{
-        res.send({
-          code: -1,
-          msg: '服务器错误'
-        })
-      }
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, comonUtils.arraySort(results, 'id', true), '执行成功')
     })
-  }else {
-    res.send({
-      code: -1,
-      data: '请求参数不正确',
-      msg: '执行失败'
-    })
+    return
   }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
 })
 
 // 获取所有文章
 router.get('/article/getAllArticleList', (req, res) => {
   connection.query(`select * from text_list order by id desc`,  (error, results)=> {
-    if (error) throw error
-    if(!error){
-      res.send({
-        code: 0,
-        data: results,
-        msg: '执行成功'
-      })
-    } else{
-      res.send({
-        code: -1,
-        msg: '服务器错误'
-      })
-    }
+    error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, results, '执行成功')
   })
 })
 
@@ -182,29 +102,11 @@ router.get('/article/details', (req, res) => {
   const { id } = req.query
   if(id) {
     connection.query(`select * from text_list where id=${id}`,  (error, results)=> {
-      if (error) throw error
-      if(!error){
-        res.send({
-          code: 0,
-          data: {
-            ...results[0]
-          },
-          msg: '执行成功'
-        })
-      } else{
-        res.send({
-          code: -1,
-          msg: '服务器错误'
-        })
-      }
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, {...results[0]}, '执行成功')
     })
-  }else {
-    res.send({
-      code: -1,
-      data: '请求参数不正确',
-      msg: '执行失败'
-    })
+    return
   }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
 })
 
 
@@ -213,20 +115,11 @@ router.get('/article/delete/byIdAndTextTye', (req, res) => {
   const { id, textType } = req.query
   if(id && textType) {
     connection.query(`delete from text_list where id='${id}' and textType='${textType}'`,  (error, results)=> {
-      if (error) throw error
-      res.send({
-        code: 0,
-        data: results,
-        msg: '执行成功'
-      })
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, results, '执行成功')
     })
-  }else {
-    res.send({
-      code: -1,
-      data: '请求参数不正确',
-      msg: '执行失败'
-    })
+    return
   }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
 })
 
 // 图片上传

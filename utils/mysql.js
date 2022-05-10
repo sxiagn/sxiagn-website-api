@@ -9,17 +9,12 @@ const sqlConfig = {
 }
 let connection = mysql.createConnection(sqlConfig)
 connection.connect(handleErro)
-// 监听连接失败，失败后重新连接
 connection.on('error', handleErro)
 
 function handleErro(err) {
-  if (err) {
-    // 如果是连接断开，自动重新连接
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-      connection.connect();
-    } else {
-      console.error('数据库报错', err.stack || err);
-    }
-  }
+  if (!err) return
+  // 如果是连接断开，自动重新连接
+  const errCodeList = ['PROTOCOL_CONNECTION_LOST', 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR', 'ETIMEDOUT']
+  errCodeList.includes(err.code) ? connection.connect(): console.error('数据库报错', err.stack || err)
 }
 module.exports = connection

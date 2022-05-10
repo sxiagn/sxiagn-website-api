@@ -64,12 +64,19 @@ function setSymbol(str) {
       resolve(false)
     })
   })
-  
 }
+/**
+ * 功能：接口返送数据到前端
+ */
+ function resSend(res, code = -1, data = null, msg = '服务器异常，请稍后重试') {
+  res.send({ code, data, msg })
+}
+
 
 module.exports = {
   getNowFormatDate,
   setSymbol,
   arraySort,
-  tokenValid
+  tokenValid,
+  resSend
 }
