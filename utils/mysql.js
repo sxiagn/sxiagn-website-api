@@ -12,6 +12,7 @@ connection.connect(handleErro)
 connection.on('error', handleErro)
 
 function handleErro(err) {
+  console.log('数据', err)
   if (!err) return
   // 如果是连接断开，自动重新连接
   const errCodeList = ['PROTOCOL_CONNECTION_LOST', 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR', 'ETIMEDOUT']
