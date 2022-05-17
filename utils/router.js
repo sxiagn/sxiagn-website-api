@@ -83,7 +83,6 @@ router.get('/article/list/byTextType', (req, res) => {
   const { textType } = req.query
   if(textType) {
     connection.query(`select * from text_list where textType=${textType}`,  (error, results)=> {
-      console.log('请求数据', error)
       error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, comonUtils.arraySort(results, 'id', true), '执行成功')
     })
     return
@@ -126,7 +125,6 @@ router.get('/article/delete/byIdAndTextTye', (req, res) => {
 // 图片上传
 // router.post('/text/upload', upload.single('fileName'),(req, res) => {
 //   const filename = `http://192.168.1.3:3000/`+req.file.filename;
-//   console.log('数据', req)
 //   connection.query(`insert into text_list (filename) values('${filename}');`, function (error, results) {
 //       if (error == null) {
 //               res.send({

@@ -25,6 +25,7 @@ app.use(router)
 
 // 错误中间件
 app.use((err, req, res, next) => {
+  console.log('请求', err)
   let code = 500;
   let msg = '服务器异常，请稍后重试';
   // token解析的错误

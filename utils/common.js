@@ -24,7 +24,6 @@ function getNowFormatDate(type = '-', isSeconds = false) {
   if (isSeconds) {
     time = time + ':' + seconds
   }
-  console.log(time)
   return time
 }
 
@@ -34,7 +33,6 @@ function getNowFormatDate(type = '-', isSeconds = false) {
  */
 function setSymbol(str) {
   const newStr = str.replace(/\'/g, '\'\'')
-  console.log(newStr)
   return newStr
 }
 /**

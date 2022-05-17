@@ -1,21 +1,22 @@
 ﻿const mysql = require('mysql')
-
+const CONST_DATA = require('./const-data')
 const sqlConfig = {
-  host     : 'localhost',
-  user     : 'root',
-  password : 'root',
-  database : 'sxiagn_website_api',
+  host: 'localhost',
+  user: 'root',
+  password: 'root',
+  database: 'sxiagn_website_api',
   useConnectionPooling: true
 }
-let connection = mysql.createConnection(sqlConfig)
-connection.connect(handleErro)
-connection.on('error', handleErro)
-
-function handleErro(err) {
-  console.log('数据', err)
-  if (!err) return
-  // 如果是连接断开，自动重新连接
-  const errCodeList = ['PROTOCOL_CONNECTION_LOST', 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR', 'ETIMEDOUT']
-  errCodeList.includes(err.code) ? connection.connect(): console.error('数据库报错', err.stack || err)
+let connection = null;
+const handleDisconnection = () => {
+  connection = mysql.createConnection(sqlConfig)
+  connection.connect(err => {
+    err && setTimeout('handleDisconnection()', 2000)
+  });
+  connection.on('error', err => {
+    CONST_DATA.ERR_CODE_LIST.includes(err.code) ? handleDisconnection() : console.log('服务器错误', err)
+  });
 }
+handleDisconnection()
+
 module.exports = connection
