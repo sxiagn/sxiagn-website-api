@@ -140,4 +140,10 @@ router.get('/article/delete/byIdAndTextTye', (req, res) => {
 //   });
 // });
 
+setInterval(() => {
+  connection.query(`select * from text_list where textType=1`,  (error, results) => {
+    console.log('5小时后mysql自动重连成功')
+  })
+}, 1000*60*60*5);
+
 module.exports = router
