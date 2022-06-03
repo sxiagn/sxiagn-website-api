@@ -42,10 +42,7 @@ function setSymbol(str) {
  * @param {Boolean} ascending (是否是升序)
  */
  function arraySort(arr = [], key = 'id', ascending = true) {
-  return arr.sort((a, b) => {
-    if (ascending) return b[key] - a[key];
-    if (!ascending) return a[key] - b[key];
-  });
+  return arr.sort((a, b) => ascending ? b[key] - a[key] : a[key] - b[key]);
 }
 /**
  * 功能：根据token做权限控制

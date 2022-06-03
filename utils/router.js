@@ -83,7 +83,8 @@ router.get('/article/list/byTextType', (req, res) => {
   const { textType } = req.query
   if(textType) {
     connection.query(`select * from text_list where textType=${textType}`,  (error, results)=> {
-      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, comonUtils.arraySort(results, 'id', true), '执行成功')
+      const resultList = textType === '3' ? comonUtils.resSend(res, 0, [], '执行成功') : comonUtils.resSend(res, 0, comonUtils.arraySort(results, 'id', true), '执行成功')
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : resultList
     })
     return
   }
