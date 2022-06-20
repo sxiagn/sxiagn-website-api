@@ -39,7 +39,6 @@ app.use((err, req, res, next) => {
     msg
   })
 })
-
 app.listen(3000, () => {
   console.log('服务器开启成功~~')
 })
