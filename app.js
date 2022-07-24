@@ -19,7 +19,7 @@ const jwtParams = {
 app.use(
   jwt(jwtParams).unless({
     path: CONST_DATA.VISA_GREE
-  }) // 无需校验的页面
+  }) // 无需校验的路由
 )
 app.use(router)
 
