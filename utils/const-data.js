@@ -7,7 +7,8 @@ module.exports = {
     '/article/getAllArticleList',
     '/article/details',
     '/article/getHotArticleList',
-    '/article/getAllProblemList'
+    '/article/getAllProblemList',
+    '/covid/pandemic/list'
   ],
   ERR_CODE_LIST: ['PROTOCOL_CONNECTION_LOST', 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR', 'ETIMEDOUT']
 }

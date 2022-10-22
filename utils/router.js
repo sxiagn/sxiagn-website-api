@@ -4,6 +4,7 @@ const comonUtils = require('./common')
 const router = express.Router()
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+const axios = require('axios')
 // 生成token插件
 const jwt = require('jsonwebtoken')
 const CONST_DATA = require('./const-data')
@@ -166,6 +167,20 @@ router.get('/article/delete/byIdAndTextTye', (req, res) => {
     return
   }
   comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
+})
+
+// 获取新冠疫情数据-新浪开放接口
+router.get('/covid/pandemic/list', (req, res) => {
+  axios({
+    method: 'get',
+    url: `https://c.m.163.com/ug/api/wuhan/app/data/list-total?t=${new Date().getTime()}`
+  }).then(response => {
+    response.data.code = 0 
+    response.data.msg = '执行成功'
+    res.json(response.data)
+  }).catch(() => {
+    comonUtils.resSend(res, -1, '系统异常，请刷新重新尝试', '执行失败')
+  });
 })
 
 // 图片上传
