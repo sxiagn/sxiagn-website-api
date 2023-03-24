@@ -183,23 +183,49 @@ router.get('/covid/pandemic/list', (req, res) => {
   });
 })
 
-// 图片上传
-// router.post('/text/upload', upload.single('fileName'),(req, res) => {
-//   const filename = `http://192.168.1.3:3000/`+req.file.filename;
-//   connection.query(`insert into text_list (filename) values('${filename}');`, function (error, results) {
-//       if (error == null) {
-//               res.send({
-//                   msg: "新增成功",
-//                   code: 200,
-//               });
-//       }else{
-//           res.send({
-//               msg: "服务器内部错误",
-//               code: 500
-//           });
-//       }
-//   });
-// });
+
+// 新增开关
+router.post('/switch/add', async (req, res) => {
+  const { switchCode, switchDescribe, switchStatus } = req.body
+  if(switchCode && switchDescribe && switchStatus) {
+    const codeStr = comonUtils.setSymbol(switchCode)
+    const newDescribe = comonUtils.setSymbol(switchDescribe)
+    const createTime = comonUtils.getNowFormatDate()
+    connection.query(`insert into switch_list(switchCode,switchDescribe,switchStatus,createTime) value('${codeStr}','${newDescribe}','${switchStatus}','${createTime}')`, (error, results)=> {
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, null, '执行成功')
+    })
+    return
+  }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
+})
+
+// 获取所有开关
+router.get('/switch/list', (req, res) => {
+  connection.query(`select * from switch_list order by id desc`,  (error, results)=> {
+    error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, results, '执行成功')
+  })
+})
+
+// 编辑开关
+router.post('/switch/edit', async (req, res) => {
+  const { switchCode, switchDescribe, switchStatus, id } = req.body
+  const createTime = comonUtils.getNowFormatDate()
+  if(id && switchCode && switchDescribe && switchStatus) {
+    const codeStr = comonUtils.setSymbol(switchCode)
+    const newDescribe = comonUtils.setSymbol(switchDescribe)
+    connection.query(`update switch_list set switchCode='${codeStr}',switchDescribe='${newDescribe}',switchStatus='${switchStatus}',createTime='${createTime}' where id='${id}'`, (error, results)=> {
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, null, '执行成功')
+    })
+    return
+  } else if(id && switchStatus) {
+    connection.query(`update switch_list set switchStatus='${switchStatus}',createTime='${createTime}' where id='${id}'`, (error, results)=> {
+      error ? comonUtils.resSend(res, -1, null, '服务器异常，请稍后重试') : comonUtils.resSend(res, 0, null, '执行成功')
+    })
+    return
+  }
+  comonUtils.resSend(res, -1, '入参异常，请检查传参是否正确', '执行失败')
+})
+
 
 setInterval(() => {
   connection.query(`select * from text_list where textType=1`,  (error, results) => {
